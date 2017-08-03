@@ -19,8 +19,6 @@ namespace WebViewToPDF
         public override void DidReceiveMemoryWarning()
         {
             base.DidReceiveMemoryWarning();
-
-            // Release any cached data, images, etc that aren't in use.
         }
 
         public override void ViewDidLoad()
@@ -37,8 +35,10 @@ namespace WebViewToPDF
 
             string contentDirectoryPath = Path.Combine(NSBundle.MainBundle.BundlePath, "Content/");
 
-            webView = new UIWebView();
-            webView.Frame = View.Frame;
+            webView = new UIWebView()
+            {
+                Frame = View.Frame
+            };
             webView.LoadHtmlString(html, new NSUrl(contentDirectoryPath, true));
             View.AddSubview(webView);
         }
@@ -48,14 +48,16 @@ namespace WebViewToPDF
             var fileName = "Test.pdf";
             double height, width;
 
+            //A4 page size.
             width = 595.2;
             height = 841.8;
 
             var renderer = new UIPrintPageRenderer();
 
             //EvaluateJavascript can be used but it will ignore anything thats not html.
-            //UIMarkupTextPrintFormatter can be replaced with HTML string.
             renderer.AddPrintFormatter(new UIMarkupTextPrintFormatter(webView.EvaluateJavascript("document.documentElement.outerHTML")), 0);
+            //EvaluateJavascript can be replaced with HTML string if you have no need to display the HTML in a UIWebView.
+            //renderer.AddPrintFormatter(new UIMarkupTextPrintFormatter(html), 0);
 
             var paperRect = new CGRect(0, 0, width, height);
             var printableRect = RectangleFExtensions.Inset(paperRect, 0, 0);
